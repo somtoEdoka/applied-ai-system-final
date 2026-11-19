@@ -76,13 +76,20 @@ score, and recommendation table. The structured trace is written to
 
 ### Running Tests
 
-Run the starter tests with:
+Run the test suite with:
 
 ```bash
-pytest
+python -m pytest -v
 ```
 
-You can add more tests in `tests/test_recommender.py`.
+Run the reliability evaluation harness for representative profile scenarios:
+
+```bash
+python -m src.eval_harness
+```
+
+The harness prints a Markdown table with scenario results, the overall pass rate,
+and average confidence.
 
 ---
 
