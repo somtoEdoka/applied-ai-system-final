@@ -1,0 +1,16 @@
+flowchart TD
+    UI["User Input"] --> GV["Guardrails & Validator"]
+    GV --> AP["Agent Planner"]
+    AP --> RAG["Local RAG Retriever"]
+    RAG --> WR["Weighted Recommender"]
+    WR --> SC["Self-Critique & Bias Check"]
+    SC -->|"Low diversity: adjust strategy / penalty and rerank"| AP
+    SC -->|"Accepted ranking"| CS["Confidence Scorer & JSON Logger"]
+    CS --> OUT["Recommendations + explanations"]
+    CS --> TRACE[("logs/agent_trace.json")]
+    OUT --> EVAL["Eval Harness / Human Review"]
+    EVAL --> REPORT["Scenario results and human assessment"]
+    TESTS["Automated Testing (pytest)"] -. "validate inputs, ranking, confidence, traces" .-> GV
+    TESTS -. "validate scoring and reranking" .-> WR
+    TESTS -. "validate trace output" .-> CS
+    EVAL -. "checks pass criteria across profiles" .-> SC

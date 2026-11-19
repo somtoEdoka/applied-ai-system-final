@@ -22,7 +22,7 @@ The base `balanced` mode retains the original 30-point genre and 25-point mood e
 
 The rules are simple to understand, and the score reasons make rankings easy to inspect. When a profile uses labels that exist in the catalog, songs that match those labels tend to rise to the top. Energy matching also helps distinguish songs with different intensity.
 
-## 6. Observed Behavior / Biases
+## 6. Limitations and Biases
 
 The catalog contains only 18 hand-curated songs, with many genres and moods represented by just one song, so recommendations reflect the catalog's gaps rather than the full range of music. An exact genre match is worth 30 points and an exact mood match is worth 25, which can outweigh close audio-feature matches and may keep users in a narrow genre or mood. When a profile asks for an unseen genre and mood, as in our adversarial test, neither preference can match; the results are then driven largely by available numeric preferences. The agent checks artist and genre concentration, but its reranking cannot guarantee diversity when the catalog is limited.
 
@@ -263,3 +263,49 @@ This simulation is built to teach and demonstrate content-based filtering. It co
 ## 10. Personal Reflection
 
 My biggest learning moment was seeing how changing a few weights changed which songs appeared near the top. AI tools helped me implement and explain the recommender, but I needed to double-check the CSV schema, the scoring math and weights, and the exact CLI output. I was surprised that simple weighted rules could still feel like real recommendations because the matches were recognizable and the reasons were clear. If I extended the project, I would add a larger catalog and use listener feedback, such as likes and skips, to improve recommendations.
+
+## 11. Potential Misuse and Prevention
+
+In a commercial setting, an operator could manipulate feature weights to create
+pay-to-play rankings, or optimize only for engagement and amplify an echo
+chamber. The system does not accept sponsorship signals, but its scoring weights
+are code and could be changed by an operator; transparent per-song reasons make
+such changes easier to inspect, not impossible. The current mitigations are
+explainable score reasons, profile validation, a genre/artist concentration
+check, and repeat-artist penalties during reranking. These are safeguards rather
+than guarantees: review of weight changes and broader catalog-level audits would
+be necessary before any production use.
+
+## 12. Reliability Testing Surprises
+
+The evaluation harness passed all 7 of its deterministic scenarios, including
+empty and missing profiles, unknown genres, conflicting sad/high-energy input,
+and extreme numeric values. That 100% pass rate measures the harness's explicit
+contract checks (no crash, expected result count, expected input-guardrail
+behavior, and bounded confidence), not whether every recommendation is
+subjectively good. A lofi top-3 trace triggered both genre and artist
+concentration checks; the agent reranked with `mood_first` and a 3-point
+repeat-artist penalty, but the final top 3 still remained 100% lofi. This showed
+that a deterministic correction can respond correctly while still being unable
+to overcome catalog limitations.
+
+The adversarial profile also demonstrated why confidence needs careful
+interpretation: the confidence score fell when genre and mood were missing from
+the catalog, while it remained within its defined 0.0–1.0 range. The score is a
+heuristic derived from ranking margin, catalog coverage, and input reliability;
+it is not a calibrated probability that a user will like the songs.
+
+## 13. AI Collaboration Reflection
+
+**Accepted suggestion:** I accepted the AI-assisted recommendation to keep
+scoring strategies explicit and modular (the Strategy pattern) and to make the
+agent workflow a sequence of inspectable steps. This kept scoring weights
+separate from orchestration and made the plan, retrieval, ranking, critique,
+and trace easier to test.
+
+**Rejected/revised suggestion:** I rejected the more complex direction of
+adding an external LLM and vector-database service for retrieval. The project
+uses deterministic local JSON retrieval instead, so tests and grading run
+without network access, API keys, or nondeterministic model responses. This
+trades semantic retrieval quality and scale for reproducibility and ease of
+inspection, which better fits this small teaching catalog.

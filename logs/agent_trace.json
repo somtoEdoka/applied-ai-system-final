@@ -2,10 +2,7 @@
   "profiles": [
     {
       "profile": {
-        "genre": "lofi",
-        "mood": "focused",
-        "energy": 0.4,
-        "scenario": "study"
+        "genre": "lofi"
       },
       "validation": {
         "warnings": [],
@@ -13,11 +10,11 @@
         "fallback": false
       },
       "plan": {
-        "strategy": "balanced",
-        "retrieval_query": "lofi focused study"
+        "strategy": "genre_first",
+        "retrieval_query": "lofi"
       },
       "retrieval": {
-        "query": "lofi focused study",
+        "query": "lofi",
         "contexts": [
           {
             "category": "genre",
@@ -29,22 +26,6 @@
               "reading"
             ],
             "note": "Lo-fi's restrained dynamics and soft textures can make it a comfortable background for focused work; lyrics and repetition still affect individual listeners.",
-            "scoring_tags": [
-              "focused",
-              "calm",
-              "introspective"
-            ]
-          },
-          {
-            "category": "scenario",
-            "key": "study",
-            "terms": [
-              "study",
-              "focus",
-              "reading",
-              "work"
-            ],
-            "note": "A study playlist may benefit from steady pacing and low distraction. Instrumental or familiar tracks can help some people maintain focus.",
             "scoring_tags": [
               "focused",
               "calm",
@@ -70,355 +51,87 @@
         ]
       },
       "ranking": {
-        "strategy": "balanced",
-        "diversity_penalty": 0.5,
+        "strategy": "mood_first",
+        "diversity_penalty": 3.0,
         "recommendations": [
           {
             "title": "Focus Flow",
             "artist": "LoRoom",
-            "score": 80.0,
+            "score": 23.0,
             "reasons": [
-              "genre match (+30.0)",
-              "mood match (+25.0)",
-              "energy proximity (+15.00)",
-              "detailed mood tags match (+10.00)"
+              "genre match (+15.0)",
+              "detailed mood tags match (+8.00)"
             ]
           },
           {
             "title": "Midnight Coding",
             "artist": "LoRoom",
-            "score": 50.7612612613,
+            "score": 17.3333333333,
             "reasons": [
-              "genre match (+30.0)",
-              "energy proximity (+14.59)",
-              "detailed mood tags match (+6.67)",
-              "diversity penalty (-0.50: repeat artist)"
+              "genre match (+15.0)",
+              "detailed mood tags match (+5.33)",
+              "diversity penalty (-3.00: repeat artist)"
             ]
           },
           {
             "title": "Library Rain",
             "artist": "Paper Lanterns",
-            "score": 43.9864864865,
+            "score": 15.0,
             "reasons": [
-              "genre match (+30.0)",
-              "energy proximity (+13.99)"
-            ]
-          },
-          {
-            "title": "Blue Note Alley",
-            "artist": "Low Lantern",
-            "score": 17.5225225225,
-            "reasons": [
-              "energy proximity (+14.19)",
-              "detailed mood tags match (+3.33)"
-            ]
-          },
-          {
-            "title": "Coffee Shop Stories",
-            "artist": "Slow Stereo",
-            "score": 14.3918918919,
-            "reasons": [
-              "energy proximity (+14.39)"
+              "genre match (+15.0)"
             ]
           }
         ]
       },
       "guardrail": {
         "initial": {
-          "passed": true,
+          "passed": false,
           "threshold": 0.6,
-          "findings": []
+          "findings": [
+            {
+              "type": "genre_concentration",
+              "value": "lofi",
+              "share": 1.0,
+              "count": 3,
+              "top_k": 3
+            },
+            {
+              "type": "artist_concentration",
+              "value": "loroom",
+              "share": 0.6667,
+              "count": 2,
+              "top_k": 3
+            }
+          ]
         },
         "final": {
-          "passed": true,
+          "passed": false,
           "threshold": 0.6,
-          "findings": []
+          "findings": [
+            {
+              "type": "genre_concentration",
+              "value": "lofi",
+              "share": 1.0,
+              "count": 3,
+              "top_k": 3
+            },
+            {
+              "type": "artist_concentration",
+              "value": "loroom",
+              "share": 0.6667,
+              "count": 2,
+              "top_k": 3
+            }
+          ]
         },
-        "action": "No adjustment required."
+        "action": "Re-ranked with strategy=mood_first and diversity_penalty=3.0; guardrail still flags concentration."
       },
       "confidence": {
-        "score": 0.9108,
+        "score": 0.7766,
         "components": {
-          "score_margin": 0.7451,
+          "score_margin": 0.3617,
           "match_coverage": 1.0,
           "input_reliability": 1.0
-        }
-      }
-    },
-    {
-      "profile": {
-        "genre": "pop",
-        "mood": "intense",
-        "energy": 0.9,
-        "scenario": "workout"
-      },
-      "validation": {
-        "warnings": [],
-        "conflicts": [],
-        "fallback": false
-      },
-      "plan": {
-        "strategy": "energy_focused",
-        "retrieval_query": "pop intense workout"
-      },
-      "retrieval": {
-        "query": "pop intense workout",
-        "contexts": [
-          {
-            "category": "scenario",
-            "key": "workout",
-            "terms": [
-              "workout",
-              "exercise",
-              "gym",
-              "training"
-            ],
-            "note": "Workout selections often benefit from a clear pulse and energy that fits the activity, with intensity adjusted to the listener's preference.",
-            "scoring_tags": [
-              "energetic",
-              "driving",
-              "confident"
-            ]
-          },
-          {
-            "category": "general",
-            "key": "music listening",
-            "terms": [
-              "music",
-              "listening",
-              "general"
-            ],
-            "note": "Musical preferences are personal; treat this catalog's matches as suggestions and keep room for discovery.",
-            "scoring_tags": []
-          }
-        ],
-        "scoring_tags_added": [
-          "energetic",
-          "driving",
-          "confident"
-        ]
-      },
-      "ranking": {
-        "strategy": "energy_focused",
-        "diversity_penalty": 0.5,
-        "recommendations": [
-          {
-            "title": "Gym Hero",
-            "artist": "Max Pulse",
-            "score": 69.509009009,
-            "reasons": [
-              "genre match (+15.0)",
-              "mood match (+10.0)",
-              "energy proximity (+43.18)",
-              "detailed mood tags match (+1.33)"
-            ]
-          },
-          {
-            "title": "Sunrise City",
-            "artist": "Neon Echo",
-            "score": 55.8018018018,
-            "reasons": [
-              "genre match (+15.0)",
-              "energy proximity (+40.14)",
-              "detailed mood tags match (+0.67)"
-            ]
-          },
-          {
-            "title": "Storm Runner",
-            "artist": "Voltline",
-            "score": 55.0585585586,
-            "reasons": [
-              "mood match (+10.0)",
-              "energy proximity (+44.39)",
-              "detailed mood tags match (+0.67)"
-            ]
-          },
-          {
-            "title": "Paper Crown",
-            "artist": "Static Youth",
-            "score": 45.0585585586,
-            "reasons": [
-              "energy proximity (+44.39)",
-              "detailed mood tags match (+0.67)"
-            ]
-          },
-          {
-            "title": "Neon Pulse",
-            "artist": "Vector Bloom",
-            "score": 43.8423423423,
-            "reasons": [
-              "energy proximity (+43.18)",
-              "detailed mood tags match (+0.67)"
-            ]
-          }
-        ]
-      },
-      "guardrail": {
-        "initial": {
-          "passed": true,
-          "threshold": 0.6,
-          "findings": []
-        },
-        "final": {
-          "passed": true,
-          "threshold": 0.6,
-          "findings": []
-        },
-        "action": "No adjustment required."
-      },
-      "confidence": {
-        "score": 0.8524,
-        "components": {
-          "score_margin": 0.5782,
-          "match_coverage": 1.0,
-          "input_reliability": 1.0
-        }
-      }
-    },
-    {
-      "profile": {
-        "genre": "shoegaze",
-        "mood": "sad",
-        "energy": 1.0,
-        "scenario": "heartbreak"
-      },
-      "validation": {
-        "warnings": [
-          "Clamped energy to the range 0.0–1.0.",
-          "Ignored unknown profile field: unexpected_field.",
-          "Genre 'shoegaze' is not present in the catalog.",
-          "Mood 'sad' is not present in the catalog.",
-          "High energy conflicts with the requested sad mood."
-        ],
-        "conflicts": [
-          "High energy conflicts with the requested sad mood."
-        ],
-        "fallback": true
-      },
-      "plan": {
-        "strategy": "energy_focused",
-        "retrieval_query": "shoegaze sad heartbreak"
-      },
-      "retrieval": {
-        "query": "shoegaze sad heartbreak",
-        "contexts": [
-          {
-            "category": "mood",
-            "key": "sad",
-            "terms": [
-              "sad",
-              "heartbreak",
-              "heartbroken",
-              "melancholic",
-              "melancholy"
-            ],
-            "note": "For heartbreak or sadness, some listeners prefer music that validates the mood while others prefer a gradual shift toward comfort; avoid assuming one response fits everyone.",
-            "scoring_tags": [
-              "reflective",
-              "introspective",
-              "melancholic"
-            ]
-          },
-          {
-            "category": "scenario",
-            "key": "heartbreak",
-            "terms": [
-              "heartbreak",
-              "breakup",
-              "sad",
-              "heartbroken"
-            ],
-            "note": "Heartbreak listening can be reflective or uplifting depending on what the listener wants; offer emotionally varied choices rather than prescribing a mood.",
-            "scoring_tags": [
-              "reflective",
-              "introspective",
-              "hopeful"
-            ]
-          },
-          {
-            "category": "general",
-            "key": "music listening",
-            "terms": [
-              "music",
-              "listening",
-              "general"
-            ],
-            "note": "Musical preferences are personal; treat this catalog's matches as suggestions and keep room for discovery.",
-            "scoring_tags": []
-          }
-        ],
-        "scoring_tags_added": [
-          "reflective",
-          "introspective",
-          "melancholic",
-          "hopeful"
-        ]
-      },
-      "ranking": {
-        "strategy": "energy_focused",
-        "diversity_penalty": 0.5,
-        "recommendations": [
-          {
-            "title": "Iron Horizon",
-            "artist": "Black Meridian",
-            "score": 42.5675675676,
-            "reasons": [
-              "energy proximity (+42.57)"
-            ]
-          },
-          {
-            "title": "Gym Hero",
-            "artist": "Max Pulse",
-            "score": 40.7432432432,
-            "reasons": [
-              "energy proximity (+40.74)"
-            ]
-          },
-          {
-            "title": "Storm Runner",
-            "artist": "Voltline",
-            "score": 39.527027027,
-            "reasons": [
-              "energy proximity (+39.53)"
-            ]
-          },
-          {
-            "title": "Paper Crown",
-            "artist": "Static Youth",
-            "score": 38.3108108108,
-            "reasons": [
-              "energy proximity (+38.31)"
-            ]
-          },
-          {
-            "title": "Neon Pulse",
-            "artist": "Vector Bloom",
-            "score": 37.0945945946,
-            "reasons": [
-              "energy proximity (+37.09)"
-            ]
-          }
-        ]
-      },
-      "guardrail": {
-        "initial": {
-          "passed": true,
-          "threshold": 0.6,
-          "findings": []
-        },
-        "final": {
-          "passed": true,
-          "threshold": 0.6,
-          "findings": []
-        },
-        "action": "No adjustment required."
-      },
-      "confidence": {
-        "score": 0.2957,
-        "components": {
-          "score_margin": 0.1543,
-          "match_coverage": 0.3333,
-          "input_reliability": 0.5
         }
       }
     }

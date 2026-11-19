@@ -57,3 +57,49 @@ Manual verification confirmed 15 unique headers, 18 rows, and no missing or extr
 ## Challenge 4: Visual Summary Table
 
 The CLI formats each mode's results as an aligned ASCII table with Rank, Title, Artist, Score, and Reasons columns. Column widths are calculated from the output, using Python's standard library without requiring `tabulate`.
+
+## Agentic Workflow Reasoning Traces
+
+The agent records its sanitized profile, plan, retrieved local context, ranking,
+diversity critique, any reranking action, and confidence in
+[`logs/agent_trace.json`](logs/agent_trace.json). This excerpt is from a real
+`genre=lofi`, `k=3` run and follows the Plan -> Retrieve -> Self-Critique ->
+Re-rank path:
+
+```json
+{
+  "profile": {"genre": "lofi"},
+  "plan": {
+    "strategy": "genre_first",
+    "retrieval_query": "lofi"
+  },
+  "retrieval": {
+    "query": "lofi",
+    "contexts": [
+      {"category": "genre", "key": "lofi"},
+      {"category": "general", "key": "music listening"}
+    ],
+    "scoring_tags_added": ["focused", "calm", "introspective"]
+  },
+  "ranking": {
+    "strategy": "mood_first",
+    "diversity_penalty": 3.0
+  },
+  "guardrail": {
+    "initial": {
+      "passed": false,
+      "findings": [
+        {"type": "genre_concentration", "value": "lofi", "share": 1.0},
+        {"type": "artist_concentration", "value": "loroom", "share": 0.6667}
+      ]
+    },
+    "final": {"passed": false},
+    "action": "Re-ranked with strategy=mood_first and diversity_penalty=3.0; guardrail still flags concentration."
+  },
+  "confidence": {"score": 0.7766}
+}
+```
+
+The critique triggers a second ranking pass and increases the repeat-artist
+penalty. The trace also shows the remaining genre concentration: reranking is a
+best-effort corrective step, not a guarantee when the catalog is this small.
