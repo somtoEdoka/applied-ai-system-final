@@ -1,0 +1,67 @@
+{
+  "entries": [
+    {
+      "category": "genre",
+      "key": "lofi",
+      "terms": ["lofi", "study", "focus", "reading"],
+      "note": "Lo-fi's restrained dynamics and soft textures can make it a comfortable background for focused work; lyrics and repetition still affect individual listeners.",
+      "scoring_tags": ["focused", "calm", "introspective"]
+    },
+    {
+      "category": "genre",
+      "key": "rock",
+      "terms": ["rock", "guitar", "driving"],
+      "note": "Rock often emphasizes amplified guitars and a strong rhythmic pulse, but its energy and emotional tone vary widely.",
+      "scoring_tags": ["driving", "defiant", "intense"]
+    },
+    {
+      "category": "genre",
+      "key": "classical",
+      "terms": ["classical", "instrumental", "orchestral"],
+      "note": "Instrumental classical music offers a wide range of textures and dynamics; quieter passages may suit concentration better than dramatic movements.",
+      "scoring_tags": ["reflective", "peaceful", "serene"]
+    },
+    {
+      "category": "mood",
+      "key": "sad",
+      "terms": ["sad", "heartbreak", "heartbroken", "melancholic", "melancholy"],
+      "note": "For heartbreak or sadness, some listeners prefer music that validates the mood while others prefer a gradual shift toward comfort; avoid assuming one response fits everyone.",
+      "scoring_tags": ["reflective", "introspective", "melancholic"]
+    },
+    {
+      "category": "scenario",
+      "key": "study",
+      "terms": ["study", "focus", "reading", "work"],
+      "note": "A study playlist may benefit from steady pacing and low distraction. Instrumental or familiar tracks can help some people maintain focus.",
+      "scoring_tags": ["focused", "calm", "introspective"]
+    },
+    {
+      "category": "scenario",
+      "key": "workout",
+      "terms": ["workout", "exercise", "gym", "training"],
+      "note": "Workout selections often benefit from a clear pulse and energy that fits the activity, with intensity adjusted to the listener's preference.",
+      "scoring_tags": ["energetic", "driving", "confident"]
+    },
+    {
+      "category": "scenario",
+      "key": "heartbreak",
+      "terms": ["heartbreak", "breakup", "sad", "heartbroken"],
+      "note": "Heartbreak listening can be reflective or uplifting depending on what the listener wants; offer emotionally varied choices rather than prescribing a mood.",
+      "scoring_tags": ["reflective", "introspective", "hopeful"]
+    },
+    {
+      "category": "scenario",
+      "key": "late-night drive",
+      "terms": ["late-night drive", "night drive", "driving", "road"],
+      "note": "Late-night driving playlists can favor an even groove and immersive atmosphere. Keep the driver's attention and safe volume levels in mind.",
+      "scoring_tags": ["moody", "dreamy", "driving"]
+    },
+    {
+      "category": "general",
+      "key": "music listening",
+      "terms": ["music", "listening", "general"],
+      "note": "Musical preferences are personal; treat this catalog's matches as suggestions and keep room for discovery.",
+      "scoring_tags": []
+    }
+  ]
+}

@@ -14,7 +14,9 @@ The dataset contains **18 songs**. Each row has an ID, title, artist, genre, moo
 
 ## 4. Algorithm Summary
 
-The recommender compares a user's genre and mood with each song. An exact genre match adds 30 points, and an exact mood match adds 25 points. When a numeric target is supplied, the song earns points for being close to that target, measured against the catalog's range: energy is worth up to 15 points, tempo 10, valence 8, danceability 7, and acousticness 5. All features together can contribute up to 100 points. Songs are sorted by total score, and the top five are returned. The four command-line profiles provide genre, mood, and energy targets.
+The curator validates and sanitizes a profile, selects one of four scoring modes, and retrieves editorial notes from `data/music_knowledge.json`. Retrieved mood tags are added to the scoring profile before calling the existing content-based ranker. A post-ranking guardrail checks whether one genre or artist exceeds 60% of the requested list and reranks with adjusted strategy weights and/or artist diversity penalty when needed. The agent reports confidence based on score margin, catalog match coverage, and input reliability, and writes its steps to `logs/agent_trace.json`.
+
+The base `balanced` mode retains the original 30-point genre and 25-point mood exact-match weights, plus proximity weights for audio features. `genre_first`, `mood_first`, and `energy_focused` use alternative weights. Profiles with energy, danceability, or acousticness outside 0.0–1.0 are clamped, and conflicting or unsupported preferences are reported rather than silently treated as a strong match.
 
 ## 5. Strengths
 
@@ -22,15 +24,15 @@ The rules are simple to understand, and the score reasons make rankings easy to 
 
 ## 6. Observed Behavior / Biases
 
-The catalog contains only 18 hand-curated songs, with many genres and moods represented by just one song, so recommendations reflect the catalog's gaps rather than the full range of music. An exact genre match is worth 30 points and an exact mood match is worth 25, which can outweigh close audio-feature matches and may keep users in a narrow genre or mood. When a profile asks for an unseen genre and mood, as in our adversarial test, neither preference can match; the results are then driven by the one available numeric preference, energy. The top-five list has no artist or style diversity rule, so similar songs can crowd out less obvious discoveries.
+The catalog contains only 18 hand-curated songs, with many genres and moods represented by just one song, so recommendations reflect the catalog's gaps rather than the full range of music. An exact genre match is worth 30 points and an exact mood match is worth 25, which can outweigh close audio-feature matches and may keep users in a narrow genre or mood. When a profile asks for an unseen genre and mood, as in our adversarial test, neither preference can match; the results are then driven largely by available numeric preferences. The agent checks artist and genre concentration, but its reranking cannot guarantee diversity when the catalog is limited.
 
-In the Deep Intense Rock test, Storm Runner ranked first because it matched both requested labels and was close to the high energy target. In the conflicting profile, all five recommendations were selected on energy proximity alone. This makes the list look decisive even though the system could not satisfy two of the user's three stated preferences.
+In the Deep Intense Rock test, Storm Runner ranked first because it matched both requested labels and was close to the high energy target. The upgraded agent adds diversity checks and confidence reporting, but a small catalog can still produce a concentrated list or leave preferences unsupported. Retrieved editorial notes are contextual guidance and do not establish that a song is objectively suitable for a scenario.
 
 ---
 
 ## 7. Evaluation Process
 
-We ran `python -m src.main` for four profiles: **High-Energy Pop**, **Chill Lofi**, **Deep Intense Rock**, and the adversarial **Conflicting: Unseen Genre, Sad Mood, High Energy** profile. We checked whether songs with matching genre and mood appeared near the top, whether high-energy profiles received energetic songs, and how the conflicting profile behaved when its requested labels were absent from the catalog.
+The current `python -m src.main` run evaluates **Focused study**, **Workout**, and the adversarial **Heartbreak with high energy** profile. It prints each plan, retrieved notes, guardrail action, confidence components, and recommendation table. The full structured trace records the input warnings and whether the post-ranking guardrail passed. The baseline outputs below document the earlier recommender-only version; they are retained as a historical comparison and do not show the current agent's output.
 
 - **High-Energy Pop:** pop, happy, energy 0.85.
 - **Chill Lofi:** lofi, chill, energy 0.40.

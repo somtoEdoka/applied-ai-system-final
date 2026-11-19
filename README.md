@@ -11,7 +11,10 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+This project demonstrates an explainable, content-based music recommender wrapped
+in a small curator agent. The agent validates profiles, retrieves local editorial
+context, selects a scoring strategy, checks list diversity, estimates confidence,
+and writes a structured trace.
 
 ---
 
@@ -34,7 +37,12 @@ flowchart LR
     B --> C["Output: Sort and return Top K recommendations"]
 ```
 
-**Potential biases:** The 30-point genre weight may over-prioritize genre and narrow discovery into a filter bubble. The catalog is small and curated, so its selection may skew which genres and moods can be recommended. Exact genre and mood matching can also miss appealing cross-genre songs.
+**Potential biases:** Genre weights may over-prioritize a single style and narrow discovery. The local knowledge base and catalog are small and curated, so they can skew which genres and moods are represented. Exact genre and mood matching can also miss appealing cross-genre songs. A post-ranking guardrail checks whether one genre or artist exceeds 60% of the requested list and triggers a rerank when possible.
+
+The curator flow is: sanitize profile inputs, choose a strategy, retrieve matching
+editorial notes from `data/music_knowledge.json`, add retrieved mood tags to the
+scoring profile, rank with `recommend_songs()`, critique diversity, and record
+confidence plus step-by-step details in `logs/agent_trace.json`.
 
 ---
 
@@ -61,11 +69,10 @@ pip install -r requirements.txt
 python -m src.main
 ```
 
-The default run compares the same profile with `balanced`, `genre_first`, and `energy_focused`. Select one or more modes with repeated options, for example:
-
-```bash
-python -m src.main --mode mood_first --mode energy_focused
-```
+The default run evaluates focused-study, workout, and conflicting heartbreak
+profiles. It prints each plan, retrieved context, guardrail result, confidence
+score, and recommendation table. The structured trace is written to
+`logs/agent_trace.json`.
 
 ### Running Tests
 

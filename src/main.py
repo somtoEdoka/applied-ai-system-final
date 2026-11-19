@@ -1,21 +1,17 @@
-"""
-Command line runner for the Music Recommender Simulation.
+"""Run the local music-curator agent against representative profiles."""
 
-This file helps you quickly run and test your recommender.
-
-You will implement the functions in recommender.py:
-- load_songs
-- score_song
-- recommend_songs
-"""
-
-import argparse
+from pathlib import Path
 from typing import List, Sequence
 
 try:
-    from .recommender import SCORING_STRATEGIES, load_songs, recommend_songs
+    from .agent import MusicCuratorAgent
+    from .recommender import load_songs
 except ImportError:
-    from recommender import SCORING_STRATEGIES, load_songs, recommend_songs
+    from agent import MusicCuratorAgent
+    from recommender import load_songs
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def format_ascii_table(headers: Sequence[str], rows: Sequence[Sequence[str]]) -> str:
@@ -41,43 +37,64 @@ def format_ascii_table(headers: Sequence[str], rows: Sequence[Sequence[str]]) ->
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Compare music recommendations across scoring modes.")
-    parser.add_argument(
-        "--mode",
-        action="append",
-        choices=SCORING_STRATEGIES,
-        help="Scoring mode to run (repeat to compare modes; defaults to balanced, genre_first, and energy_focused).",
-    )
-    args = parser.parse_args()
+    songs = load_songs(str(ROOT / "data" / "songs.csv"))
+    agent = MusicCuratorAgent(songs)
+    profiles = [
+        ("Focused study", {
+            "genre": "lofi",
+            "mood": "focused",
+            "energy": 0.4,
+            "scenario": "study",
+        }),
+        ("Workout", {
+            "genre": "pop",
+            "mood": "intense",
+            "energy": 0.9,
+            "scenario": "workout",
+        }),
+        ("Adversarial: heartbreak with high energy", {
+            "genre": "shoegaze",
+            "mood": "sad",
+            "energy": 1.4,
+            "scenario": "heartbreak",
+            "unexpected_field": "ignored safely",
+        }),
+    ]
 
-    songs = load_songs("data/songs.csv")
     print(f"Loaded {len(songs)} songs.")
-
-    user_prefs = {
-        "genre": "metal",
-        "mood": "happy",
-        "energy": 0.85,
-        "popularity": 80,
-        "release_decade": 2020,
-        "detailed_mood_tags": ["happy", "uplifting", "energetic"],
-    }
-    modes = args.mode or ["balanced", "genre_first", "energy_focused"]
-    print("\nProfile: Metal preference, happy mood, high energy")
-
-    for mode in modes:
-        recommendations = recommend_songs(user_prefs, songs, k=8, mode=mode)
+    for name, profile in profiles:
+        result = agent.run(profile, k=5)
+        print(f"\nProfile: {name}")
+        if result["validation"]["warnings"]:
+            print("Input validation: " + "; ".join(result["validation"]["warnings"]))
+        print(f"Plan: strategy={result['plan']['strategy']}; "
+              f"retrieval query={result['plan']['retrieval_query']!r}")
+        print("Retrieved RAG context:")
+        for entry in result["context"]:
+            print(f"  - [{entry['category']}: {entry['key']}] {entry['note']}")
+        if result["scoring_tags_added"]:
+            print("  Contextual scoring tags: "
+                  f"{', '.join(result['scoring_tags_added'])}")
+        print(f"Guardrail action: {result['guardrail']['action']}")
+        print(f"Final guardrail: {'passed' if result['guardrail']['final']['passed'] else 'flagged'}")
+        print(f"Confidence: {result['confidence']['score']:.2f} "
+              f"(margin={result['confidence']['components']['score_margin']:.2f}, "
+              f"coverage={result['confidence']['components']['match_coverage']:.2f}, "
+              f"input reliability={result['confidence']['components']['input_reliability']:.2f})")
+        if result["guardrail"]["final"]["findings"]:
+            print(f"Guardrail findings: {result['guardrail']['final']['findings']}")
         rows: List[List[str]] = [
             [
                 str(rank),
-                song["title"],
+                song.get("title", ""),
                 song.get("artist", ""),
                 f"{score:.2f}",
                 "; ".join(reasons) if reasons else "No strong preference matches",
             ]
-            for rank, (song, score, reasons) in enumerate(recommendations, start=1)
+            for rank, (song, score, reasons) in enumerate(result["recommendations"], start=1)
         ]
-        print(f"\n{mode.replace('_', ' ').title()} - Top recommendations:")
         print(format_ascii_table(["Rank", "Title", "Artist", "Score", "Reasons"], rows))
+    print(f"\nStructured agent trace written to {agent.trace_path}")
 
 
 if __name__ == "__main__":
